@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@drawable/txt_theme33">
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/v2_top_banner"
+            >
+        <Button
+                android:id="@+id/button_adddetail_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/backbutton"
+                android:layout_centerVertical="true"
+                />
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="统计"
+                android:textSize="16sp"
+                android:layout_centerInParent="true"/>
+
+    </RelativeLayout>
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            >
+        <RadioGroup
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                >
+            <RadioButton
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:button="@drawable/radiobutton"
+                    android:checked="true"
+                    android:text="支出"
+                    />
+            <RadioButton
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:button="@drawable/radiobutton"
+                    android:layout_weight="1"
+                    android:text="收入"
+                    />
+
+        </RadioGroup>
+
+    </LinearLayout>
+
+    <LinearLayout
+            android:id="@+id/linearLayout_total"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            >
+        <GridView
+                android:id="@+id/gridView_total"
+                android:numColumns="2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clickable="false"
+                android:listSelector="#0fff"
+                android:visibility="gone"
+                ></GridView>
+        <com.qjy.accountnote.view.ArcChartView
+                android:id="@+id/arcChartView_total"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                />
+
+    </LinearLayout>
+
+</LinearLayout>
