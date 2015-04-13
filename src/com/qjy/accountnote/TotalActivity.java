@@ -3,7 +3,11 @@ package com.qjy.accountnote;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import com.lidroid.xutils.DbUtils;
 import com.lidroid.xutils.ViewUtils;
 import com.lidroid.xutils.db.sqlite.Selector;
@@ -26,6 +30,10 @@ public class TotalActivity extends Activity {
     private LinearLayout linearLayout;
     @ViewInject(R.id.arcChartView_total)
     private ArcChartView arcChartView;
+    @ViewInject(R.id.button_total_back)
+    private Button btn_back;
+    @ViewInject(R.id.radioGroup_total)
+    private RadioGroup radioGroup;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -35,15 +43,49 @@ public class TotalActivity extends Activity {
         ViewUtils.inject(this);
 
         db = DbUtils.create(this);
+
+        //算出支出比例
+        initPay();
+
+        //返回键
+        btn_back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+
+        //收入支出切换
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                switch (i){
+                    case R.id.radioButton_total_get:
+                        initGet();
+                        break;
+                    case R.id.radioButton_total_pay:
+                        initPay();
+                        break;
+                }
+            }
+        });
+    }
+
+    /**
+     * 算支出比例
+     */
+    private void initPay(){
         List<DbModel> list = new ArrayList<DbModel>();
         try {
+            //按type分类算sumMoney
             list = db.findDbModelAll(Selector.from(
                             Account.class).select("sum(money)","type")
                             .where("contentId","!=","null")
-                    .groupBy("type")
+                            .groupBy("type")
             );
 
-            List<Map<String,Object>> sumMoneyList = new ArrayList<Map<String, Object>>();
+            //用来放钱数传给ArtChartView去绘画
+            double[] arr = new double[5];
 
             if (list != null) {
                 for (DbModel model : list) {
@@ -51,32 +93,60 @@ public class TotalActivity extends Activity {
                     Set<String> keySet = dataMap.keySet();
                     double sumMoney = model.getDouble("sum(money)");
                     String type = model.getString("type");
-                    Map<String,Object> map = new HashMap<String, Object>();
-                    map.put("type",type);
-                    map.put("key",sumMoney);
-                    sumMoneyList.add(map);
-                    for (String key : keySet) {
-                        Log.d("DbUtils","SUM: "+key+" "+dataMap.get(key));
+                    if("吃".equals(type)){
+                        arr[0] = sumMoney;
+                    }else if("穿".equals(type)){
+                        arr[1] = sumMoney;
+                    }else if("住".equals(type)){
+                        arr[2] = sumMoney;
+                    }else if("行".equals(type)){
+                        arr[3] = sumMoney;
+                    }else if("用".equals(type)){
+                        arr[4] = sumMoney;
                     }
                 }
+
+                arcChartView.loadData(arr,"");
             }
+        } catch (DbException e) {
+            e.printStackTrace();
+        }
+    }
 
 
+    /**
+     * 画出收入比例饼状图
+     */
+    private void initGet(){
+        List<DbModel> list = new ArrayList<DbModel>();
+        try {
+            //按type分类算sumMoney
+            list = db.findDbModelAll(Selector.from(
+                            Account.class).select("sum(money)","type")
+                            .where("contentId","==","null")
+                            .groupBy("type")
+            );
 
-//            for (int i = 0; i < list.size(); i++) {
-//                list.get(i).getDouble("sum");
-//                arr[i] = list.get(i).getMoney();
-//            }
-//            for (int i = 0; i < arr.length; i++) {
-//                Log.e("HAHA",arr[i]+"");
-//            }
+            //用来放钱数传给ArtChartView去绘画
+            double[] arr = new double[5];
 
-//            arcChartView.loadData(arr,"haha");
+            if (list != null) {
+                for (DbModel model : list) {
+                    HashMap<String, String> dataMap = model.getDataMap();
+                    Set<String> keySet = dataMap.keySet();
+                    double sumMoney = model.getDouble("sum(money)");
+                    String type = model.getString("type");
+                    if("工资".equals(type)){
+                        arr[0] = sumMoney;
+                    }else if("外快".equals(type)){
+                        arr[1] = sumMoney;
+                    }else if("其他".equals(type)){
+                        arr[2] = sumMoney;
+                    }
+                }
 
-
-//            ArcChartView view = new ArcChartView(this);
-//            view.loadData(arr,"money");
-//            linearLayout.addView(view);
+                arcChartView.loadData(arr,"");
+            }
         } catch (DbException e) {
             e.printStackTrace();
         }

@@ -3,6 +3,7 @@ package com.qjy.accountnote.view;
 import android.content.Context;
 import android.graphics.*;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 /**
@@ -49,6 +50,7 @@ public class ArcChartView extends View {
 
     public void loadData(float[] content){
         this.content = content;
+        Log.e("HAHA","invalidate");
         invalidate();
     }
 
@@ -70,7 +72,7 @@ public class ArcChartView extends View {
         super.onDraw(canvas);
 
         //清除内容
-        canvas.drawColor(Color.WHITE);
+        canvas.drawColor(Color.parseColor("#00ffffff"));
 
 
         //画一个弧线
@@ -80,16 +82,21 @@ public class ArcChartView extends View {
         //第四个参数是否连接中心点
         //第五个参数paint
 
+        Log.e("onDRAW","drawCicle");
+
+
         float startDegree = 0;
         for (int i = 0; i < content.length; i++) {
             arcPaint.setColor(colors[i]);
             float endDegree =  (content[i] * 360);
             canvas.drawArc(arcRect,startDegree, endDegree, true, arcPaint);
             startDegree = startDegree+endDegree;
+
+            Log.e("onDRAW",""+endDegree);
         }
-        arcRect = new RectF(40, 40, 80, 80);
+        arcRect = new RectF(40, 40, 300, 300);
         arcPaint.setColor(Color.WHITE);
-        canvas.drawCircle(60, 60, 20, arcPaint);
+        canvas.drawCircle(170, 170, 40, arcPaint);
 
 
     }
